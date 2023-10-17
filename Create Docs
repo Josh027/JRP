@@ -1,0 +1,46 @@
+function createRTW() {
+
+var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('RTW NOTICE');
+var sample = sh.getRange("D15").getDisplayValues();
+
+var response = Browser.msgBox('PDF will be sent to your email.', Browser.Buttons.OK_CANCEL);
+if ( response == 'ok') {
+var hh = sh.getRange("G:G").getValues()
+var lastRow = getLastRowSpecial(hh) + 1
+
+const docFile = DriveApp.getFileById('1x6PaaYDCaeF46QhXP-aweJ2dsMPDh7MOK-Yzhf1HbXg');
+const tempfolder = DriveApp.getFolderById('1j0nVcie8YVDwMEnFgo6GcZ8tP2lddho2');
+const tempFile = docFile.makeCopy(tempfolder);
+const temp_file = DocumentApp.openById(tempFile.getId());
+const body = temp_file.getBody();
+
+body.replaceText("sample",sample);
+
+  sh.getRange(lastRow,13).setValue(email)
+
+temp_file.saveAndClose();
+const pdfcontent = tempFile.getAs(MimeType.PDF).setName("RTW" + " - " + name +".pdf");
+
+GmailApp.sendEmail(email,"RTW" + " - " + name,"Below is the downloadable PDF file.",{
+  attachments: [pdfcontent],
+  name: "HR Automail",cc: ""
+});
+Browser.msgBox("File sent!")
+}
+}
+
+function getLastRowSpecial(range){
+  var rowNum = 0;
+  var blank = false;
+  for(var row = 0; row < range.length; row++){
+ 
+    if(range[row][0] === "" && !blank){
+      rowNum = row;
+      blank = true;
+ 
+    }else if(range[row][0] !== ""){
+      blank = false;
+    };
+  };
+  return rowNum;
+};
